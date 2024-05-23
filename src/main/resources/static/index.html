@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiffrement de Fichiers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chiffrement de Fichiers</h1>
+        <form id="encryptionForm">
+            <div class="form-group">
+                <label for="file">Fichier à chiffrer :</label>
+                <input type="file" id="file" name="file" required>
+            </div>
+            <div class="form-group">
+                <label for="algorithm">Algorithme de chiffrement :</label>
+                <select id="algorithm" name="algorithm" required>
+                    <option value="AES">AES</option>
+                    <option value="DES">DES</option>
+                    <option value="Blowfish">Blowfish</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="keySize">Longueur de la clé :</label>
+                <select id="keySize" name="keySize" required>
+                    <option value="128">128 bits</option>
+                    <option value="192">192 bits</option>
+                    <option value="256">256 bits</option>
+                </select>
+            </div>
+            <button type="submit">Chiffrer le fichier</button>
+        </form>
+        <div id="result" style="display:none;">
+            <h2>Résultat</h2>
+            <p><strong>Clé de chiffrement :</strong> <span id="encryptionKey"></span></p>
+            <p><strong>Fichier chiffré :</strong> <a id="encryptedFileLink" href="#" download>Télécharger</a></p>
+        </div>
+    </div>
+    <script>
+        document.getElementById('encryptionForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const form = new FormData(this);
+            const response = await fetch('/api/encryption/encrypt', {
+                method: 'POST',
+                body: form
+            });
+            const result = await response.json();
+            if (response.ok) {
+                document.getElementById('encryptionKey').textContent = result.key;
+                document.getElementById('encryptedFileLink').href = 'file://' + result.filePath;
+                document.getElementById('result').style.display = 'block';
+            } else {
+                alert('Erreur : ' + result);
+            }
+        });
+    </script>
+</body>
+</html>
